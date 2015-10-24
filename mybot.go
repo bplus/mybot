@@ -43,6 +43,7 @@ func main() {
 	// start a websocket-based Real Time API session
 	ws, id := slackConnect(os.Args[1])
 	fmt.Println("mybot ready, ^C exits")
+	fmt.Println(fmt.Sprintf("id is %s", id))
 
 	for {
 		// read each incoming message
@@ -51,6 +52,10 @@ func main() {
 			log.Fatal(err)
 		}
 
+		fmt.Println(m.Channel)
+		fmt.Println(m.Type)
+		fmt.Println(m.Text)
+		fmt.Println(m.Id)
 		// see if we're mentioned
 		if m.Type == "message" && strings.HasPrefix(m.Text, "<@"+id+">") {
 			// if so try to parse if
@@ -67,6 +72,11 @@ func main() {
 				m.Text = fmt.Sprintf("sorry, that does not compute\n")
 				postMessage(ws, m)
 			}
+		}
+
+		if m.Type == "message" && strings.Contains(m.Text, "http") {
+			m.Text = "I guess I should save that, eh?"
+			postMessage(ws, m)
 		}
 	}
 }
