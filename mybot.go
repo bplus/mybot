@@ -28,7 +28,8 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"log"
+	"io/ioutil"
+    "log"
 	"net/http"
 	"os"
 	"strings"
@@ -87,6 +88,7 @@ func main() {
 						}
 						fmt.Println(x)
 						postMessage(ws, x)
+                        postUrl(m.Text, divvy[0])
 					} else {
 						x := Message{}
 						fmt.Println("no need to divide this one up:" + url)
@@ -97,6 +99,7 @@ func main() {
 						}
 						fmt.Println(x)
 						postMessage(ws, x)
+                        postUrl(m.Text, url)
 					}
 				}
 			}
@@ -131,4 +134,49 @@ func getQuote(sym string) string {
 		return fmt.Sprintf("%s (%s) is trading at $%s", rows[0][0], rows[0][1], rows[0][2])
 	}
 	return fmt.Sprintf("unknown response format (symbol was \"%s\")", sym)
+}
+
+func postUrl(raw string, in_url string) (id int, err error) {
+    fmt.Println("I got to the postUrl function... 1")
+    url := "http://localhost:3000/links"
+    json := `{"raw":"this is rawXXX", "url":"this is the urlXXX", "ts":"2015-10-26T10:03:33.93428"}`
+    b := strings.NewReader(json)
+    resp, err := http.Post(url, "application/json", b)
+    if err != nil {
+    fmt.Println("I got to the postUrl function... 2")
+    log.Fatal(err)
+
+        return
+    }
+    if resp.StatusCode != 200 && resp.StatusCode != 201 {
+    fmt.Println("I got to the postUrl function... 3")
+        err = fmt.Errorf("API request failed with code %d", resp.StatusCode)
+        return
+    }
+    body, err := ioutil.ReadAll(resp.Body)
+    fmt.Println(body)
+    fmt.Println("I got to the postUrl function... 4")
+    resp.Body.Close()
+    fmt.Println("I got to the postUrl function... 5")
+    if err != nil {
+    fmt.Println("I got to the postUrl function... 6")
+        return
+    }
+    fmt.Println("I got to the postUrl function... 7")
+
+    /* var respObj userInfoContainer
+    err = json.Unmarshal(body, &respObj)
+    if err != nil {
+        return
+    }
+
+    if !respObj.Ok {
+        err = fmt.Errorf("Slack error: %s", respObj.Error)
+        return
+    }
+
+    name = respObj.User.Name
+    */
+    id = 999
+    return
 }
