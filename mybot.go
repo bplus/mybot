@@ -80,15 +80,21 @@ func main() {
 						x := Message{}
 						divvy := strings.SplitN(url, "|", 2)
 						fmt.Println("keep " + divvy[0])
-						// x = Message{Type: "message", Channel: m.Channel, Text: divvy[0]}
-						x = Message{Type: "message", Channel: m.Channel, Text: "saveing a divided url..."}
+						if strings.EqualFold(id, m.User) {
+							x = Message{Type: "message", Channel: m.Channel, Text: "this was from me, so I won't post it and cause a loop."}
+						} else {
+							x = Message{Type: "message", Channel: m.Channel, Text: "saving an DIVIDED url..." + divvy[0]}
+						}
 						fmt.Println(x)
 						postMessage(ws, x)
 					} else {
 						x := Message{}
 						fmt.Println("no need to divide this one up:" + url)
-						// x = Message{Type: "message", Channel: m.Channel, Text: url}
-						x = Message{Type: "message", Channel: m.Channel, Text: "saving an undivided url..."}
+						if strings.EqualFold(id, m.User) {
+							x = Message{Type: "message", Channel: m.Channel, Text: "this was from me, so I won't post it and cause a loop."}
+						} else {
+							x = Message{Type: "message", Channel: m.Channel, Text: "saving an undivided url..." + url}
+						}
 						fmt.Println(x)
 						postMessage(ws, x)
 					}
@@ -97,7 +103,7 @@ func main() {
 		}
 
 		if m.Type == "message" && strings.Contains(m.Text, "http") {
-			m.Text = "I guess I should save that, eh? "
+			m.Text = "I guess I should save that, eh " + m.User + "?"
 			postMessage(ws, m)
 		}
 	}
