@@ -32,6 +32,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/mvdan/xurls"
 )
 
 func main() {
@@ -52,10 +54,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println(m.Channel)
-		fmt.Println(m.Type)
-		fmt.Println(m.Text)
-		fmt.Println(m.Id)
 		// see if we're mentioned
 		if m.Type == "message" && strings.HasPrefix(m.Text, "<@"+id+">") {
 			// if so try to parse if
@@ -74,8 +72,32 @@ func main() {
 			}
 		}
 
+		if m.Type == "message" {
+			urls := []string(xurls.Relaxed.FindAllString(m.Text, -1))
+			if len(urls) > 0 {
+				for _, url := range urls {
+					if strings.Contains(url, "|") {
+						x := Message{}
+						divvy := strings.SplitN(url, "|", 2)
+						fmt.Println("keep " + divvy[0])
+						// x = Message{Type: "message", Channel: m.Channel, Text: divvy[0]}
+						x = Message{Type: "message", Channel: m.Channel, Text: "saveing a divided url..."}
+						fmt.Println(x)
+						postMessage(ws, x)
+					} else {
+						x := Message{}
+						fmt.Println("no need to divide this one up:" + url)
+						// x = Message{Type: "message", Channel: m.Channel, Text: url}
+						x = Message{Type: "message", Channel: m.Channel, Text: "saving an undivided url..."}
+						fmt.Println(x)
+						postMessage(ws, x)
+					}
+				}
+			}
+		}
+
 		if m.Type == "message" && strings.Contains(m.Text, "http") {
-			m.Text = "I guess I should save that, eh?"
+			m.Text = "I guess I should save that, eh? "
 			postMessage(ws, m)
 		}
 	}

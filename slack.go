@@ -96,6 +96,7 @@ type Message struct {
 
 func getMessage(ws *websocket.Conn) (m Message, err error) {
 	err = websocket.JSON.Receive(ws, &m)
+	fmt.Println(m)
 	return
 }
 
