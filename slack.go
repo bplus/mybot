@@ -50,6 +50,19 @@ type responseSelf struct {
 	Id string `json:"id"`
 }
 
+type userInfoContainer struct {
+	Ok    bool   `json:ok"`
+	Error string `json:"error"`
+	User  struct {
+		Id   string `json:"id"`   // not sure if this will work
+		Name string `json:"name"` // not sure if this will work
+	}
+	IsAdmin  bool `json:"is_admin"`
+	IsOwner  bool `json:"is_owner"`
+	Has2FA   bool `json:"has_2fa"`
+	HasFiles bool `json:"has_files"`
+}
+
 // slackStart does a rtm.start, and returns a websocket URL and user ID. The
 // websocket URL can be used to initiate an RTM session.
 func slackStart(token string) (wsurl, id string, err error) {
@@ -80,6 +93,37 @@ func slackStart(token string) (wsurl, id string, err error) {
 
 	wsurl = respObj.Url
 	id = respObj.Self.Id
+	return
+}
+
+func getUserName(token string, userid string) (name string, err error) {
+	url := fmt.Sprintf("https://slack.com/api/users.info?token=%s&user=%s", token, userid)
+	resp, err := http.Get(url)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != 200 {
+		err = fmt.Errorf("API request failed with code %d", resp.StatusCode)
+		return
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return
+	}
+
+	var respObj userInfoContainer
+	err = json.Unmarshal(body, &respObj)
+	if err != nil {
+		return
+	}
+
+	if !respObj.Ok {
+		err = fmt.Errorf("Slack error: %s", respObj.Error)
+		return
+	}
+
+	name = respObj.User.Name
 	return
 }
 

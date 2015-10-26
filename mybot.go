@@ -103,7 +103,12 @@ func main() {
 		}
 
 		if m.Type == "message" && strings.Contains(m.Text, "http") {
-			m.Text = "I guess I should save that, eh " + m.User + "?"
+			username, err := getUserName(os.Args[1], m.User)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			m.Text = "I guess I should save that, eh " + m.User + ", AKA " + username + "?"
 			postMessage(ws, m)
 		}
 	}
