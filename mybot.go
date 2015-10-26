@@ -79,34 +79,38 @@ func main() {
 			if len(urls) > 0 {
 				for _, url := range urls {
 					if strings.Contains(url, "|") {
-						x := Message{}
+						//x := Message{}
 						divvy := strings.SplitN(url, "|", 2)
 						fmt.Println("keep " + divvy[0])
-						if strings.EqualFold(id, m.User) {
+                        /*						
+                        if strings.EqualFold(id, m.User) {
 							x = Message{Type: "message", Channel: m.Channel, Text: "this was from me, so I won't post it and cause a loop."}
 						} else {
 							x = Message{Type: "message", Channel: m.Channel, Text: "saving an DIVIDED url..." + divvy[0]}
 						}
 						fmt.Println(x)
 						postMessage(ws, x)
+                        */
                         postUrl(m.Text, divvy[0])
 					} else {
-						x := Message{}
+						//x := Message{}
 						fmt.Println("no need to divide this one up:" + url)
-						if strings.EqualFold(id, m.User) {
+						/*
+                        if strings.EqualFold(id, m.User) {
 							x = Message{Type: "message", Channel: m.Channel, Text: "this was from me, so I won't post it and cause a loop."}
 						} else {
 							x = Message{Type: "message", Channel: m.Channel, Text: "saving an undivided url..." + url}
 						}
 						fmt.Println(x)
 						postMessage(ws, x)
+                        */
                         postUrl(m.Text, url)
 					}
 				}
 			}
 		}
 
-		if m.Type == "message" && strings.Contains(m.Text, "http") {
+		/*if m.Type == "message" && strings.Contains(m.Text, "http") {
 			username, err := getUserName(os.Args[1], m.User)
 			if err != nil {
 				log.Fatal(err)
@@ -114,7 +118,7 @@ func main() {
 
 			m.Text = "I guess I should save that, eh " + m.User + ", AKA " + username + "?"
 			postMessage(ws, m)
-		}
+		}*/
 	}
 }
 
