@@ -33,9 +33,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
-//"time"
-"bytes"
-"encoding/json"
+    "bytes"
+    "encoding/json"
 	"github.com/mvdan/xurls"
 )
 
@@ -141,29 +140,18 @@ func getQuote(sym string) string {
 type urlPost struct {
     Raw string `json:"raw"`
     Url string `json:"url"`
-    Timestamp string `json:"ts"`
 }
 
 func postUrl(raw string, in_url string) (id int, err error) {
     apiUrl := "http://localhost:3000/links"
-    postBody := urlPost{Raw:raw, Url: in_url, Timestamp: "2015-10-26T10:03:33.93428"} // Timestamp: time.Now().Format(time.RFC850)}
+    postBody := urlPost{Raw:raw, Url: in_url}
     if err != nil {
         log.Fatal(err)
     }
 
     pu, err := json.Marshal(postBody)
-    fmt.Println("just a struct")
-    fmt.Println(postBody)
-    fmt.Println("marshalled and string()'d")
-    fmt.Println(string(pu))
-
     client := &http.Client{}
-    //r, _ := http.NewRequest("POST", apiUrl, bytes.NewReader(pu))
-    //r.Header.Add("Content-Type", "application/json")
-    //resp, _ := client.Do(r)
-
     resp, err := client.Post(apiUrl, "application/json", bytes.NewBufferString(string(pu)))
-    //resp, err := client.Post(apiUrl, "application/json", bytes.NewReader(postBody))
 
     if err != nil {
         log.Fatal(err)
@@ -185,19 +173,6 @@ func postUrl(raw string, in_url string) (id int, err error) {
     }
     fmt.Println("I got to the postUrl function... 7")
 
-    /* var respObj userInfoContainer
-    err = json.Unmarshal(body, &respObj)
-    if err != nil {
-        return
-    }
-
-    if !respObj.Ok {
-        err = fmt.Errorf("Slack error: %s", respObj.Error)
-        return
-    }
-
-    name = respObj.User.Name
-    */
     id = 999
     return
 }
