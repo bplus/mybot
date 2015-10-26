@@ -33,7 +33,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
-
+//"time"
+"bytes"
+"encoding/json"
 	"github.com/mvdan/xurls"
 )
 
@@ -136,30 +138,49 @@ func getQuote(sym string) string {
 	return fmt.Sprintf("unknown response format (symbol was \"%s\")", sym)
 }
 
-func postUrl(raw string, in_url string) (id int, err error) {
-    fmt.Println("I got to the postUrl function... 1")
-    url := "http://localhost:3000/links"
-    json := `{"raw":"this is rawXXX", "url":"this is the urlXXX", "ts":"2015-10-26T10:03:33.93428"}`
-    b := strings.NewReader(json)
-    resp, err := http.Post(url, "application/json", b)
-    if err != nil {
-    fmt.Println("I got to the postUrl function... 2")
-    log.Fatal(err)
+type urlPost struct {
+    Raw string `json:"raw"`
+    Url string `json:"url"`
+    Timestamp string `json:"ts"`
+}
 
+func postUrl(raw string, in_url string) (id int, err error) {
+    apiUrl := "http://localhost:3000/links"
+    postBody := urlPost{Raw:raw, Url: in_url, Timestamp: "2015-10-26T10:03:33.93428"} // Timestamp: time.Now().Format(time.RFC850)}
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    pu, err := json.Marshal(postBody)
+    fmt.Println("just a struct")
+    fmt.Println(postBody)
+    fmt.Println("marshalled and string()'d")
+    fmt.Println(string(pu))
+
+    client := &http.Client{}
+    //r, _ := http.NewRequest("POST", apiUrl, bytes.NewReader(pu))
+    //r.Header.Add("Content-Type", "application/json")
+    //resp, _ := client.Do(r)
+
+    resp, err := client.Post(apiUrl, "application/json", bytes.NewBufferString(string(pu)))
+    //resp, err := client.Post(apiUrl, "application/json", bytes.NewReader(postBody))
+
+    if err != nil {
+        log.Fatal(err)
         return
     }
     if resp.StatusCode != 200 && resp.StatusCode != 201 {
-    fmt.Println("I got to the postUrl function... 3")
+        fmt.Println("I got to the postUrl function... Here is the error!:")
         err = fmt.Errorf("API request failed with code %d", resp.StatusCode)
+        fmt.Println(err)
+        fmt.Println(resp)
         return
     }
     body, err := ioutil.ReadAll(resp.Body)
     fmt.Println(body)
-    fmt.Println("I got to the postUrl function... 4")
     resp.Body.Close()
-    fmt.Println("I got to the postUrl function... 5")
     if err != nil {
-    fmt.Println("I got to the postUrl function... 6")
+        fmt.Println("I got to the postUrl function... 6")
         return
     }
     fmt.Println("I got to the postUrl function... 7")
