@@ -91,6 +91,12 @@ func main() {
 						fmt.Println(x)
 						postMessage(ws, x)
                         */
+						u, err := getUserName(os.Args[1], m.User)
+						if err != nil {
+							log.Fatal(err)
+						}
+						fmt.Println(u, " = ", m.User)
+
                         postUrl(m.Text, divvy[0])
 					} else {
 						//x := Message{}
@@ -104,6 +110,12 @@ func main() {
 						fmt.Println(x)
 						postMessage(ws, x)
                         */
+						u, err := getUserName(os.Args[1], m.User)
+						if err != nil {
+							log.Fatal(err)
+						}
+						fmt.Println(u, " = ", m.User)
+
                         postUrl(m.Text, url)
 					}
 				}

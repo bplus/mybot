@@ -50,7 +50,7 @@ type responseSelf struct {
 	Id string `json:"id"`
 }
 
-type userInfoContainer struct {
+type UserInfoContainer struct {
 	Ok    bool   `json:ok"`
 	Error string `json:"error"`
 	User  struct {
@@ -112,7 +112,7 @@ func getUserName(token string, userid string) (name string, err error) {
 		return
 	}
 
-	var respObj userInfoContainer
+	var respObj UserInfoContainer
 	err = json.Unmarshal(body, &respObj)
 	if err != nil {
 		return
